@@ -96,6 +96,8 @@ export function useClipboardHandler() {
 	return useRefEffect( ( node ) => {
 		function handler( event ) {
 			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const removeConsecutiveLineBreaks = ( string ) =>
+				string.replace( /\n\n+/g, '\n\n' );
 
 			if ( selectedBlockClientIds.length === 0 ) {
 				return;
@@ -161,7 +163,7 @@ export function useClipboardHandler() {
 
 					event.clipboardData.setData(
 						'text/plain',
-						stripHTML( serialized )
+						removeConsecutiveLineBreaks( stripHTML( serialized ) )
 					);
 					event.clipboardData.setData( 'text/html', serialized );
 				}
