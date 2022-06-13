@@ -366,6 +366,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * "var:preset|color|secondary" to the form
 	 * "--wp--preset--color--secondary".
 	 *
+	 * It also converts references to a path to the value
+	 * stored at that location, e.g.
+	 * styles.color.background => #fff
+	 *
 	 * @param array $styles Styles subtree.
 	 * @param array $path   Which property to process.
 	 * @return string Style property value.
