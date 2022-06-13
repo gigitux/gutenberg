@@ -225,7 +225,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$node         = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$selector     = $block_metadata['selector'];
 		$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
-		$declarations = static::compute_style_properties( $node, $settings );
+		$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json );
 		$block_rules  = '';
 
 		// 1. Separate the ones who use the general selector
@@ -300,5 +300,114 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		return $block_rules;
+	}
+
+	/**
+	 * Given a styles array, it extracts the style properties
+	 * and adds them to the $declarations array following the format:
+	 *
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
+	 *
+	 * @param array $styles Styles to process.
+	 * @param array $settings Theme settings.
+	 * @param array $properties Properties metadata.
+	 * @return array Returns the modified $declarations.
+	 */
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null ) {
+		if ( null === $properties ) {
+			$properties = static::PROPERTIES_METADATA;
+		}
+
+		$declarations = array();
+		if ( empty( $styles ) ) {
+			return $declarations;
+		}
+
+		foreach ( $properties as $css_property => $value_path ) {
+			$value = static::get_property_value( $styles, $value_path, $theme_json );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			//var_dump( $value_path );
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					array_key_exists( $path_string, static::PROTECTED_PROPERTIES ) &&
+					_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
+			}
+
+			// Skip if empty and not "0" or value represents array of longhand values.
+			$has_missing_value = empty( $value ) && ! is_numeric( $value );
+			if ( $has_missing_value || is_array( $value ) ) {
+				continue;
+			}
+
+			$declarations[] = array(
+				'name'  => $css_property,
+				'value' => $value,
+			);
+		}
+
+		return $declarations;
+	}
+
+	/**
+	 * Returns the style property for the given path.
+	 *
+	 * It also converts CSS Custom Property stored as
+	 * "var:preset|color|secondary" to the form
+	 * "--wp--preset--color--secondary".
+	 *
+	 * @param array $styles Styles subtree.
+	 * @param array $path   Which property to process.
+	 * @return string Style property value.
+	 */
+	protected static function get_property_value( $styles, $path, $theme_json = null ) {
+		$value = _wp_array_get( $styles, $path, '' );
+
+		if ( '' === $value || is_array( $value ) ) {
+			return $value;
+		}
+
+		$prefix     = 'var:';
+		$prefix_len = strlen( $prefix );
+		$token_in   = '|';
+		$token_out  = '--';
+		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
+			$unwrapped_name = str_replace(
+				$token_in,
+				$token_out,
+				substr( $value, $prefix_len )
+			);
+			$value          = "var(--wp--$unwrapped_name)";
+		}
+
+		// If the value begins with styles or settings then
+		// get the corresponding value from that place in theme.json.
+		$styles_prefix       = 'styles';
+		$styles_prefix_len   = strlen( $styles_prefix );
+		$has_styles_prefix   = 0 === strncmp( $value, $styles_prefix, $styles_prefix_len );
+		$settings_prefix     = 'settings';
+		$settings_prefix_len = strlen( $settings_prefix );
+		$has_settings_prefix = 0 === strncmp( $value, $settings_prefix, $settings_prefix_len );
+		if ( $has_styles_prefix || $has_settings_prefix ) {
+			// Get the path of the style/setting.
+			$value_path = explode( '.', $value );
+			$new_value = _wp_array_get( $theme_json, $value_path );
+			// Only use the new value if we find anything.
+			if ( ! empty( $new_value ) ) {
+				$value = $new_value;
+			}
+		}
+
+		return $value;
 	}
 }

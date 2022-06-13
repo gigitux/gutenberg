@@ -27,6 +27,23 @@
 		},
 		"spacing": {
 			"margin": [ "top", "bottom" ]
+		},
+		"__experimentalStyle": {
+			"color": {
+				"text": "red"
+			},
+			"border": {
+				"bottom": {
+					"color": "currentColor",
+					"style": "solid",
+					"width": "1px"
+				},
+				"top": {
+					"color": "currentColor",
+					"style": "solid",
+					"width": "1px"
+				}
+			}
 		}
 	},
 	"styles": [
