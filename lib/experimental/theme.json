@@ -242,7 +242,7 @@
 	"styles": {
 		"color": {
 			"background": "#fff",
-			"color": "#32373c"
+			"text": "#32373c"
 		},
 		"spacing": { "blockGap": "24px" },
 		"elements": {
