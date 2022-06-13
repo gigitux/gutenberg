@@ -241,13 +241,14 @@
 	},
 	"styles": {
 		"color": {
-			"background": "#fff"
+			"background": "#fff",
+			"color": "#32373c"
 		},
 		"spacing": { "blockGap": "24px" },
 		"elements": {
 			"button": {
 				"color": {
-					"background": "#32373c",
+					"background": "styles.color.text",
 					"text": "styles.color.background"
 				}
 			}
