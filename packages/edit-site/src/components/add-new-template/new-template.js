@@ -38,7 +38,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import AddCustomTemplateModal from './add-custom-template-modal';
-import { usePostTypes, usePostTypesHaveEntities } from './utils';
+import { usePostTypes, usePostTypesEntitiesInfo } from './utils';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
@@ -78,7 +78,6 @@ const TEMPLATE_ICONS = {
 export default function NewTemplate( { postType } ) {
 	const history = useHistory();
 	const postTypes = usePostTypes();
-	const postTypesHaveEntities = usePostTypesHaveEntities();
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] = useState(
 		false
 	);
@@ -96,6 +95,7 @@ export default function NewTemplate( { postType } ) {
 		} ),
 		[]
 	);
+	const postTypesEntitiesInfo = usePostTypesEntitiesInfo( existingTemplates );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
@@ -139,11 +139,9 @@ export default function NewTemplate( { postType } ) {
 			} );
 		}
 	}
-
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
-
 	// TODO: rename to missingDefaultTemplates(or combine these arrays like`missingPostTypeTemplates`).
 	// Also it's weird that we don't have a single source of truth for the default templates. Needs looking..
 	const missingTemplates = filter(
@@ -153,7 +151,6 @@ export default function NewTemplate( { postType } ) {
 			! includes( existingTemplateSlugs, template.slug )
 	);
 
-	// TODO: make all strings translatable.
 	const extraTemplates = ( postTypes || [] ).reduce(
 		( accumulator, _postType ) => {
 			const {
@@ -165,7 +162,7 @@ export default function NewTemplate( { postType } ) {
 			const hasGeneralTemplate = existingTemplateSlugs?.includes(
 				`single-${ slug }`
 			);
-			const hasEntities = postTypesHaveEntities?.[ slug ];
+			const hasEntities = postTypesEntitiesInfo?.[ slug ]?.hasEntities;
 			const menuItem = {
 				slug: `single-${ slug }`,
 				title: sprintf(
@@ -184,17 +181,6 @@ export default function NewTemplate( { postType } ) {
 			// We have a different template creation flow only if they have entities.
 			if ( hasEntities ) {
 				menuItem.onClick = ( template ) => {
-					const slugsWithTemplates = (
-						existingTemplates || []
-					).reduce( ( _accumulator, existingTemplate ) => {
-						const prefix = `single-${ slug }-`;
-						if ( existingTemplate.slug.startsWith( prefix ) ) {
-							_accumulator.push(
-								existingTemplate.slug.substring( prefix.length )
-							);
-						}
-						return _accumulator;
-					}, [] );
 					setShowCustomTemplateModal( true );
 					setEntityForSuggestions( {
 						type: 'postType',
@@ -202,7 +188,8 @@ export default function NewTemplate( { postType } ) {
 						labels: { singular: singularName, plural: name },
 						hasGeneralTemplate,
 						template,
-						slugsWithTemplates,
+						postsToExclude:
+							postTypesEntitiesInfo[ slug ].existingPosts,
 					} );
 				};
 			}
@@ -210,27 +197,6 @@ export default function NewTemplate( { postType } ) {
 			// entities and the general template exists.
 			if ( ! hasGeneralTemplate || hasEntities ) {
 				accumulator.push( menuItem );
-			}
-			// Add conditionally the `archive-$post_type` item.
-			// `post` is a special post type and doesn't have `archive-post`.
-			if (
-				slug !== 'post' &&
-				! existingTemplateSlugs?.includes( `archive-${ slug }` )
-			) {
-				accumulator.push( {
-					slug: `archive-${ slug }`,
-					title: sprintf(
-						// translators: %s: Name of the post type e.g: "Post".
-						__( '%s archive' ),
-						singularName
-					),
-					description: sprintf(
-						// translators: %s: Name of the post type in plural e.g: "Posts".
-						__( 'Displays archive of %s.' ),
-						name
-					),
-					icon,
-				} );
 			}
 			return accumulator;
 		},
