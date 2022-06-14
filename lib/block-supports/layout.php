@@ -151,26 +151,32 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  * have the style engine generate a more extensive list of utility classnames which
  * will then replace this method.
  *
- * @param array $block_attributes Array of block attributes.
+ * @param array $layout   			Array of layout attributes for the current block.
+ * @param array $layout_definitions Array of layout definitions.
  *
  * @return array Array of CSS classname strings.
  */
-function gutenberg_get_layout_classes( $block_attributes ) {
+function gutenberg_get_layout_classes( $layout, $layout_definitions ) {
 	$class_names = array();
 
-	if ( empty( $block_attributes['layout'] ) ) {
-		return $class_names;
+	$layout_type_class_name = _wp_array_get( $layout_definitions, array( 'default', 'className' ), '' );
+	if ( ! empty( $layout['type'] ) ) {
+		$layout_type_class_name = _wp_array_get( $layout_definitions, array( $layout['type'], 'className' ), '' );
 	}
 
-	if ( ! empty( $block_attributes['layout']['orientation'] ) ) {
-		$class_names[] = 'is-' . sanitize_title( $block_attributes['layout']['orientation'] );
+	if ( $layout_type_class_name ) {
+		$class_names[] = $layout_type_class_name;
 	}
 
-	if ( ! empty( $block_attributes['layout']['justifyContent'] ) ) {
-		$class_names[] = 'is-content-justification-' . sanitize_title( $block_attributes['layout']['justifyContent'] );
+	if ( ! empty( $layout['orientation'] ) ) {
+		$class_names[] = 'is-' . sanitize_title( $layout['orientation'] );
 	}
 
-	if ( ! empty( $block_attributes['layout']['flexWrap'] ) && 'nowrap' === $block_attributes['layout']['flexWrap'] ) {
+	if ( ! empty( $layout['justifyContent'] ) ) {
+		$class_names[] = 'is-content-justification-' . sanitize_title( $layout['justifyContent'] );
+	}
+
+	if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
 		$class_names[] = 'is-nowrap';
 	}
 
@@ -204,21 +210,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	// TODO: Should we handle the case where a block has opted out of using a classname? (e.g. how paragraph disables classnames).
-	$block_classname  = wp_get_block_default_classname( $block['blockName'] );
-	$container_class  = wp_unique_id( 'wp-container-' );
-	$class_names      = gutenberg_get_layout_classes( $block['attrs'] );
-	$layout_classname = '';
-
-	if ( isset( $used_layout['type'] ) ) {
-		$layout_classname = _wp_array_get( $default_layout, array( 'definitions', $used_layout['type'], 'className' ), '' );
-	} else {
-		$layout_classname = _wp_array_get( $default_layout, array( 'definitions', 'default', 'className' ), '' );
-	}
-
-	if ( $layout_classname && is_string( $layout_classname ) ) {
-		$class_names[] = sanitize_title( $layout_classname );
-	}
+	$layout_definitions = _wp_array_get( $default_layout, array( 'definitions' ), array() );
+	$block_class_name   = wp_get_block_default_classname( $block['blockName'] );
+	$container_class    = wp_unique_id( 'wp-container-' );
+	$class_names        = gutenberg_get_layout_classes( $used_layout, $layout_definitions );
 
 	$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
 	// Skip if gap value contains unsupported characters.
@@ -237,7 +232,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
+	$style                         = gutenberg_get_layout_style( ".$block_class_name.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
 
 	// Only add container class and enqueue block support styles if unique styles were generated.
 	if ( ! empty( $style ) ) {
