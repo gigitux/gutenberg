@@ -531,7 +531,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		) { /* ... */ }
 		```
 
-	7. If the component doesn't forwards its ref yet, wrap the component in a `forwardRed` call. Alternatively, if you want to take advantage of the [Context system](#context-system), you can use the `contextConnect` utility function (which also takes care of adding ref forwarding)
+	7. If the component doesn't forward its ref yet, wrap the component in a `forwardRef` call. Alternatively, if you want to take advantage of the [Context system](#context-system), you can use the `contextConnect` utility function (which also takes care of adding ref forwarding)
 
 		```jsx
 		// With `forwardRef`
