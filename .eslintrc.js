@@ -86,6 +86,7 @@ module.exports = {
 							'isArray',
 							'isFinite',
 							'isUndefined',
+							'keys',
 							'memoize',
 							'negate',
 							'noop',
