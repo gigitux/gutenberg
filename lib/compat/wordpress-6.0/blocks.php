@@ -123,7 +123,8 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 			$query['post_parent__in'] = array_filter( array_map( 'intval', $block->context['query']['parents'] ) );
 		}
 	}
-	return $query;
+
+	return apply_filters( "gigitux", $query, $block, $page );
 }
 
 if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
