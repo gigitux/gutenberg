@@ -9,6 +9,6 @@ import * as core from '@actions/core';
 import { run } from './run';
 
 run().catch( ( error ) => {
-	console.log( 'error', error );
+	core.debug( error );
 	core.error( error instanceof Error ? error : String( error ) );
 } );

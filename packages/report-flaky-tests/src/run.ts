@@ -41,7 +41,7 @@ async function run() {
 	);
 
 	if ( ! flakyTests || flakyTests.length === 0 ) {
-		console.log( 'no tests' );
+		core.debug( 'no tests' );
 		// No flaky tests reported in this run.
 		return;
 	}
@@ -155,7 +155,8 @@ async function run() {
 					labels: [ label ],
 				} );
 			} catch ( error ) {
-				console.log( 'creation error', error );
+				core.debug( 'creation error' );
+				core.debug( JSON.stringify( error, null, 4 ) );
 			}
 		}
 
@@ -171,7 +172,7 @@ async function run() {
 	}
 
 	if ( reportedIssues.length === 0 ) {
-		console.log( 'reported Issue', reportedIssues.length );
+		core.debug( 'reported Issue' );
 		return;
 	}
 
