@@ -41,6 +41,7 @@ async function run() {
 	);
 
 	if ( ! flakyTests || flakyTests.length === 0 ) {
+		console.log( 'no tests' );
 		// No flaky tests reported in this run.
 		return;
 	}
@@ -142,16 +143,20 @@ async function run() {
 			// Don't create a flaky test issue if the test was run inside a PR.
 			! isPR
 		) {
-			issue = await api.createIssue( {
-				title: issueTitle,
-				body: renderIssueBody( {
-					meta: {},
-					testTitle,
-					testPath,
-					formattedTestResults: currentFormattedTestResults,
-				} ),
-				labels: [ label ],
-			} );
+			try {
+				issue = await api.createIssue( {
+					title: issueTitle,
+					body: renderIssueBody( {
+						meta: {},
+						testTitle,
+						testPath,
+						formattedTestResults: currentFormattedTestResults,
+					} ),
+					labels: [ label ],
+				} );
+			} catch ( error ) {
+				console.log( 'creation error', error );
+			}
 		}
 
 		if ( issue ) {
@@ -166,6 +171,7 @@ async function run() {
 	}
 
 	if ( reportedIssues.length === 0 ) {
+		console.log( 'reported Issue', reportedIssues.length );
 		return;
 	}
 
