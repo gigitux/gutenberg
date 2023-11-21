@@ -19,19 +19,18 @@ interface SiteEditorOptions {
  */
 export async function visitSiteEditor(
 	this: Admin,
-	options: SiteEditorOptions = {}
+	options?: SiteEditorOptions
 ) {
-	const { postId, postType, path, canvas } = options;
 	const query = new URLSearchParams();
 
-	if ( postId ) query.set( 'postId', String( postId ) );
-	if ( postType ) query.set( 'postType', postType );
-	if ( path ) query.set( 'path', path );
-	if ( canvas ) query.set( 'canvas', canvas );
+	if (options?.postId) query.set('postId', String(options.postId));
+	if (options?.postType) query.set('postType', options.postType);
+	if (options?.path) query.set('path', options.path);
+	if (options?.canvas) query.set('canvas', options.canvas);
 
 	await this.visitAdminPage( 'site-editor.php', query.toString() );
 
-	if ( ! options.showWelcomeGuide ) {
+	if ( options?.showWelcomeGuide ) {
 		await this.editor.setPreferences( 'core/edit-site', {
 			welcomeGuide: false,
 			welcomeGuideStyles: false,
