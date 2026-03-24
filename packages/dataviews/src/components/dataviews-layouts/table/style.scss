@@ -31,7 +31,7 @@
 		&.dataviews-view-table__actions-column--sticky {
 			position: sticky;
 			right: 0;
-			background-color: var(--wp-dataviews-color-background, $white);
+			background-color: inherit;
 		}
 
 		&.dataviews-view-table__actions-column--stuck {
@@ -95,7 +95,7 @@
 			}
 
 			.dataviews-view-table__actions-column--sticky {
-				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
+				background-color: inherit;
 			}
 		}
 
@@ -115,14 +115,14 @@
 			&:focus-within,
 			&:hover {
 				.dataviews-view-table__actions-column--sticky {
-					background-color: var(--wp-dataviews-color-background, $white);
+					background-color: inherit;
 				}
 			}
 
 			&.is-selected,
 			&.is-selected:hover {
 				.dataviews-view-table__actions-column--sticky {
-					background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
+					background-color: inherit;
 				}
 			}
 		}
@@ -179,6 +179,8 @@
 		}
 	}
 	tbody {
+		background-color: inherit;
+
 		td {
 			vertical-align: top;
 		}
@@ -230,7 +232,6 @@
 		white-space: nowrap;
 	}
 
-
 	// Density style overrides.
 	&.has-compact-density {
 		thead {
@@ -267,7 +268,6 @@
 		}
 	}
 }
-
 
 .dataviews-view-table-selection-checkbox {
 	--checkbox-input-size: 24px;

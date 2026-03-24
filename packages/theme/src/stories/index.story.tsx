@@ -285,10 +285,10 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 											} }
 										>
 											<ThemeProvider
-												color={ { bg: '#f8f8f8' } }
+												color={ { bg: '#fcfcfc' } }
 											>
 												<NestingDebug
-													bg="#f8f8f8"
+													bg="#fcfcfc"
 													primary="inherit (hotpink)"
 													density="inherit (default)"
 												/>

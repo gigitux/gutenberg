@@ -23,7 +23,7 @@
 	flex-direction: column;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
-	background-color: var(--wp-dataviews-color-background, $white);
+	background-color: inherit;
 }
 
 .dataviews__view-actions,
@@ -139,5 +139,5 @@
 	position: sticky;
 	top: 0;
 	z-index: 2; // Ensure it appears above dataview items when scrolling.
-	background-color: #fff;
+	background-color: inherit;
 }

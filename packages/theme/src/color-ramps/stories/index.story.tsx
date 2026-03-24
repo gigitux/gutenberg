@@ -23,7 +23,7 @@ const meta: Meta< typeof ColorGen > = {
 	component: ColorGen,
 	argTypes: {
 		background: {
-			control: { type: 'color', presetColors: [ '#1e1e1e', '#f8f8f8' ] },
+			control: { type: 'color', presetColors: [ '#1e1e1e', '#fcfcfc' ] },
 		},
 		primary: {
 			control: {
@@ -173,7 +173,7 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 		const combinations = [
 			// WordPress (light / dark)
 			{
-				background: '#f8f8f8',
+				background: '#fcfcfc',
 				primary: '#3858e9',
 			},
 			{
